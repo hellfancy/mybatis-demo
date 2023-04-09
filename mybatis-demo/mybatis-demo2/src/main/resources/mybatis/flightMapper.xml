@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--<mapper namespace="userMapper">-->
+<mapper namespace="mapper.FlightMapper">
+    <resultMap id="flightMap" type="entity.Flight">
+        <id column="id" property="id"></id>
+        <result column="flight_id" property="flightId"></result>
+        <result column="company" property="company"></result>
+        <result column="departure_airport" property="departureAirport"></result>
+        <result column="arrive_airport" property="arriveAirport"></result>
+        <result column="departure_time" property="departureTime"></result>
+        <result column="arrive_time" property="arriveTime"></result>
+        <result column="model" property="model"></result>
+        <result column="is_delete" property="isDelete"></result>
+    </resultMap>
+    <!-- 设置数据库字段与实体相映射-->
+    <select id="getByFlightAll" resultType="entity.Flight">
+        select id as id, flight_id as flightId,  company as company, departure_airport as departureAirport,
+               arrive_airport as arriveAirport, departure_time as departureTime, arrive_time as arriveTime,
+               model as model, is_delete as isDelete from mayikt_flight
+    </select>
+    <!-- 或者使用resultMap-->
+    <select id="getByFlightAll2" resultMap="flightMap">
+        select * from mayikt_flight where id = 2
+    </select>
+
+    <!-- 参数查找 添加标签parameterType-->
+    <select id="getByIdFlight" parameterType="int" resultMap="flightMap">
+        select * from mayikt_flight where id = #{id}
+    </select>
+
+    <!-- 插入语句使用insert标签-->
+    <insert id="insertFlight" parameterType="entity.Flight">
+        insert into mayikt_flight(`id`, `flight_id`, `company`, `departure_airport`, `arrive_airport`, `departure_time`, `arrive_time`, `model`, `is_delete`)
+        values (null, #{flightId}, #{company}, #{departureAirport}, #{arriveAirport}, #{departureTime}, #{arriveTime}, #{model}, #{isDelete})
+    </insert>
+
+    <!-- 删除语句使用delete标签-->
+    <delete id="deleteByIdFlight" parameterType="int">
+        delete from mayikt_flight where id = #{id}
+    </delete>
+
+    <!-- 修改使用update标签-->
+    <update id="updateFlight" parameterType="entity.Flight">
+        update mayikt_flight
+        set `id` = #{id}, `flight_id` = #{flightId}, `company` = #{company},
+            `departure_airport`= #{departureAirport},`arrive_airport`= #{arriveAirport},
+            `departure_time` = #{departureTime},`arrive_time` = #{arriveTime}, `model` = #{model},
+            `is_delete` = #{isDelete}
+        where id = #{id}
+    </update>
+
+    <!-- 多条件查询 法一：使用map-->
+    <select id="getByFlightParameterMap" resultMap="flightMap">
+        select * from mayikt_flight
+        where company = #{company} and departure_airport = #{departureAirport} and arrive_airport = #{arriveAirport}
+    </select>
+
+    <!-- 法二：使用 @param 给指定参数-->
+    <select id="getByFlightParameter" resultMap="flightMap">
+        select * from mayikt_flight
+        where company = #{company} and departure_airport = #{departureAirport} and arrive_airport = #{arriveAirport}
+    </select>
+
+    <!-- 法三：传递Pojo（实体）-->
+    <select id="getByFlightPoJo" parameterType="entity.Flight" resultMap="flightMap">
+        select * from mayikt_flight
+        where company = #{company} and departure_airport = #{departureAirport} and arrive_airport = #{arriveAirport}
+    </select>
+
+    <!-- 动态查询，使用的上面法二-->
+    <select id="getByFlightDynamicParameter" resultMap="flightMap">
+        select * from mayikt_flight
+        <where>
+            <if test="company != null and company != ''">
+                and company = #{company}
+            </if>
+            <if test="departureAirport != null and departureAirport != ''">
+                and departure_airport = #{departureAirport}
+            </if>
+            <if test="arriveAirport != null and arriveAirport != ''">
+                and arrive_airport = #{arriveAirport}
+            </if>
+        </where>
+    </select>
+</mapper>
